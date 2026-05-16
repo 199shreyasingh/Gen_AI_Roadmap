@@ -18,45 +18,44 @@ export async function POST(req: Request) {
     }
     Only return valid JSON with no extra text.`;
 
-    const apiKey = process.env.GEMINI_API_KEY;
+    // ✅ FIX 1: Check GROQ_API_KEY, not ANTHROPIC_API_KEY
+    const apiKey = process.env.GROQ_API_KEY;
     if (!apiKey) {
       return NextResponse.json(
-        { error: "GEMINI_API_KEY is not set" },
+        { error: "GROQ_API_KEY is not set" },
         { status: 500 }
       );
     }
 
-    const aiRes = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          contents: [
-            {
-              parts: [{ text: prompt }],
-            },
-          ],
-        }),
-      }
-    );
+    const aiRes = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${apiKey}`,
+      },
+      body: JSON.stringify({
+        model: "llama-3.1-8b-instant",
+        messages: [{ role: "user", content: prompt }],
+        max_tokens: 2048,
+      }),
+    });
 
     if (!aiRes.ok) {
       const errorText = await aiRes.text();
       return NextResponse.json(
-        { error: `Gemini API error: ${errorText}` },
+        { error: `Groq API error: ${errorText}` },
         { status: aiRes.status }
       );
     }
 
     const aiData = await aiRes.json();
 
-    let outputText = aiData?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+    // ✅ FIX 2: Use `let` so we can reassign after stripping code fences
+    let outputText = aiData?.choices?.[0]?.message?.content || "";
 
-    // 1. Remove code fences if present
+    // Remove code fences if present
     outputText = outputText.replace(/```json|```/g, "").trim();
 
-    // 2. Try parsing the cleaned text
     let roadmap;
     try {
       roadmap = JSON.parse(outputText);
@@ -68,7 +67,6 @@ export async function POST(req: Request) {
       );
     }
 
-    // 3. Return the parsed object
     return NextResponse.json(roadmap);
   } catch (err) {
     console.error(err);

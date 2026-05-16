@@ -96,95 +96,109 @@ export default function TopicDetailPage() {
 
   if (!roadmap) return null;
 
+
   // --- Study Mode UI ---
   if (studyMode) {
     const stage = roadmap.stages[currentStage];
     const lesson = stage.items[currentLesson];
 
     return (
-      <div className="min-h-screen flex bg-gradient-to-br from-indigo-50 via-sky-50 to-green-50">
-        {showConfetti && <Confetti />}
-        {/* Sidebar */}
-        <aside className="w-72 bg-white border-r border-indigo-100 p-6 space-y-6">
-          <h2 className="text-2xl font-bold text-indigo-700">
-            {roadmap.title}
-          </h2>
-          <nav className="space-y-4">
-            {roadmap.stages.map((s, idx) => (
-              <button
-                key={idx}
-                onClick={() => {
-                  setCurrentStage(idx);
-                  setCurrentLesson(0);
-                }}
-                className={`block w-full text-left px-4 py-2 rounded-lg transition ${
-                  idx === currentStage
-                    ? "bg-indigo-100 text-indigo-700 font-semibold"
-                    : "hover:bg-sky-50 text-gray-700"
-                }`}
-              >
-                {s.title}
-              </button>
-            ))}
-          </nav>
-        </aside>
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-sky-50 to-green-50">
+        {/* Back Button */}
+        <div className="p-4">
+          <button
+            onClick={() => router.push("/")}
+            className="flex items-center gap-2 px-4 py-2 bg-white border border-indigo-200 rounded-lg shadow hover:bg-indigo-50 text-indigo-700 font-medium"
+            aria-label="Back to Home"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+            Back
+          </button>
+        </div>
+        <div className="flex flex-1">
+          {showConfetti && <Confetti />}
+          {/* Sidebar */}
+          <aside className="w-72 bg-white border-r border-indigo-100 p-6 space-y-6">
+            <h2 className="text-2xl font-bold text-indigo-700">
+              {roadmap.title}
+            </h2>
+            <nav className="space-y-4">
+              {roadmap.stages.map((s, idx) => (
+                <button
+                  key={idx}
+                  onClick={() => {
+                    setCurrentStage(idx);
+                    setCurrentLesson(0);
+                  }}
+                  className={`block w-full text-left px-4 py-2 rounded-lg transition ${
+                    idx === currentStage
+                      ? "bg-indigo-100 text-indigo-700 font-semibold"
+                      : "hover:bg-sky-50 text-gray-700"
+                  }`}
+                >
+                  {s.title}
+                </button>
+              ))}
+            </nav>
+          </aside>
 
-        {/* Lesson Content */}
-        <main className="flex-1 p-10">
-          <h3 className="text-3xl font-bold text-indigo-700 flex items-center gap-2">
-            <BookOpen className="w-7 h-7 text-sky-500" /> {lesson.name}
-          </h3>
-          {lesson.description && (
-            <p className="mt-4 text-gray-600">{lesson.description}</p>
-          )}
-
-          {lesson.resources && (
-            <div className="mt-6 space-y-5">
-              <h4 className="font-semibold text-indigo-600">Resources:</h4>
-              {lesson.resources.map((r, j) => {
-                return (
-                  <div key={j} className="rounded-xl overflow-hidden shadow-md">
-                    <a
-                      href={r.url}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-block text-sm px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition"
-                    >
-                      {r.label}
-                    </a>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-
-          {/* Navigation */}
-          <div className="mt-10 flex justify-between">
-            <button
-              disabled={currentLesson === 0}
-              onClick={() => setCurrentLesson(currentLesson - 1)}
-              className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
-            >
-              Previous
-            </button>
-
-            {currentLesson < stage.items.length - 1 ? (
-              <button
-                onClick={() => setCurrentLesson(currentLesson + 1)}
-                className="px-5 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600"
-              >
-                Next Lesson →
-              </button>
-            ) : (
-              <button
-                onClick={handleStageComplete}
-                className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
-              >
-                ✅ Complete Stage
-              </button>
+          {/* Lesson Content */}
+          <main className="flex-1 p-10">
+            <h3 className="text-3xl font-bold text-indigo-700 flex items-center gap-2">
+              <BookOpen className="w-7 h-7 text-sky-500" /> {lesson.name}
+            </h3>
+            {lesson.description && (
+              <p className="mt-4 text-gray-600">{lesson.description}</p>
             )}
-          </div>
-        </main>
+
+            {lesson.resources && (
+              <div className="mt-6 space-y-5">
+                <h4 className="font-semibold text-indigo-600">Resources:</h4>
+                {lesson.resources.map((r, j) => {
+                  return (
+                    <div key={j} className="rounded-xl overflow-hidden shadow-md">
+                      <a
+                        href={r.url}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="inline-block text-sm px-4 py-2 bg-indigo-100 text-indigo-700 rounded-full hover:bg-indigo-200 transition"
+                      >
+                        {r.label}
+                      </a>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* Navigation */}
+            <div className="mt-10 flex justify-between">
+              <button
+                disabled={currentLesson === 0}
+                onClick={() => setCurrentLesson(currentLesson - 1)}
+                className="px-5 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 disabled:opacity-50"
+              >
+                Previous
+              </button>
+
+              {currentLesson < stage.items.length - 1 ? (
+                <button
+                  onClick={() => setCurrentLesson(currentLesson + 1)}
+                  className="px-5 py-2 bg-sky-500 text-white rounded-lg hover:bg-sky-600"
+                >
+                  Next Lesson →
+                </button>
+              ) : (
+                <button
+                  onClick={handleStageComplete}
+                  className="px-5 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600"
+                >
+                  ✅ Complete Stage
+                </button>
+              )}
+            </div>
+          </main>
+        </div>
       </div>
     );
   }
@@ -192,6 +206,17 @@ export default function TopicDetailPage() {
   // --- Roadmap UI ---
   return (
     <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-sky-50 to-green-50 px-6 py-12">
+      {/* Back Button */}
+      <div className="absolute left-0 top-0 p-6">
+        <button
+          onClick={() => router.push("/")}
+          className="flex items-center gap-2 px-4 py-2 bg-white border border-indigo-200 rounded-lg shadow hover:bg-indigo-50 text-indigo-700 font-medium"
+          aria-label="Back to Home"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" /></svg>
+          Back
+        </button>
+      </div>
       <div className="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl p-10 border border-indigo-100 relative">
         <h1 className="text-4xl font-extrabold text-indigo-700 flex items-center gap-3">
           <BookOpen className="w-8 h-8 text-sky-500" />
